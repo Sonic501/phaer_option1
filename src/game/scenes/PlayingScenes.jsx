@@ -1,7 +1,9 @@
+import BaseScene from './BaseScene';
+
 /**
  * @typedef {import('phaser3-rex-plugins/templates/ui/ui-plugin.js')} RexUIPlugin
  */
-export default class PlayingScenes extends Phaser.Scene {
+export default class PlayingScenes extends BaseScene {
   /** @type {RexUIPlugin} */
   rexUI;
 
@@ -9,6 +11,7 @@ export default class PlayingScenes extends Phaser.Scene {
     super("PlayingScenes");
   }
   preload() {
+    this.createVolumeButton();
     this.load.image("topImg", "assets/s2_image 1.jpg");
     this.load.image("botImg", "assets/s2_image 2.jpg");
     this.load.image("timeUp", "assets/s3_popupbox.png");

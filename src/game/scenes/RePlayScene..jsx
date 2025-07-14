@@ -1,4 +1,6 @@
-export default class RePlayScene extends Phaser.Scene {
+import BaseScene from "./BaseScene";
+
+export default class RePlayScene extends BaseScene {
   constructor() {
     super("RePlayScene");
   }
@@ -13,6 +15,7 @@ export default class RePlayScene extends Phaser.Scene {
     this.load.video("video", "assets/video.mp4");
   }
   create() {
+    this.createVolumeButton();
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
     const centerX = width / 2;
@@ -30,7 +33,6 @@ export default class RePlayScene extends Phaser.Scene {
     replay.setInteractive().on("pointerdown", () => {
       this.cameras.main.fadeOut(300, 0, 0, 0);
       this.cameras.main.once("camerafadeoutcomplete", () => {
-        console.log("test", this.scene);
         this.scene.transition({
           target: "PlayingScenes",
           duration: 600,

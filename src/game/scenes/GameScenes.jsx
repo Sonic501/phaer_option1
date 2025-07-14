@@ -1,10 +1,14 @@
 import Phaser from "phaser";
+import BaseScene from "./BaseScene";
 
-export default class GameScene extends Phaser.Scene {
+export default class GameScene extends BaseScene {
   constructor() {
     super("GameScene");
   }
+
   preload() {
+    this.load.image("volume", "assets/volume/volume.png");
+    this.load.image("mute", "assets/volume/enable-sound.png");
     this.load.image("charactor", "assets/s1_character.png");
     this.load.image("logo", "assets/s1_logo.png");
     this.load.image("text1", "assets/s1_text1.png");
@@ -12,61 +16,51 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("btn", "assets/s1_Play game bt.png");
     this.load.image("footer", "assets/s1_legal line.png");
   }
+
   create() {
-    const width = this.cameras.main.width;
+    this.createVolumeButton(); // từ BaseScene
+
+    const { width } = this.cameras.main;
     const centerX = width / 2;
-    const panda = this.add.image(centerX - 100, 430, "charactor").setAlpha(0);
+
+    // 🎴 Panda
+    this.panda = this.add.image(centerX - 100, 430, "charactor").setAlpha(0);
     const desiredHeight = 600;
-    const scalePanda = desiredHeight / panda.height;
-    panda.setScale(scalePanda);
-    // logo
-    const logo = this.add.image(centerX, 160, "logo");
-    // ui group
-    const text1 = this.add.image(0, 0, "text1").setAlpha(0);
-    const text2 = this.add.image(0, 0, "text2").setAlpha(0).setScale(1.6);
-    const btn = this.add.image(0, 0, "btn").setAlpha(0).setScale(0.2);
-    const footer = this.add.image(0, 0, "footer");
-    // handle btn
-    btn.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.cameras.main.once("camerafadeoutcomplete", () => {
-        this.scene.transition({
-          target: "PlayingScenes",
-          duration: 600,
-          moveBelow: true,
-          onUpdate: null,
-          data: {}
-        });
-      });
-      
-    });
-    
-    text1.y = -100;
-    text2.y = 70;
-    btn.y = 150;
-    footer.y = 220;
-    console.log(width)
-    const UIGroup = this.add.container(centerX, width, [
-      text1,
-      text2,
-      btn,
-      footer,
+    const scalePanda = desiredHeight / this.panda.height;
+    this.panda.setScale(scalePanda);
+
+    // 🐼 Logo
+    this.logo = this.add.image(centerX, 160, "logo");
+
+    // 📦 UI Elements
+    this.text1 = this.add.image(0, 0, "text1").setAlpha(0).setY(-100);
+    this.text2 = this.add.image(0, 0, "text2").setAlpha(0).setScale(1.6).setY(70);
+    this.btn = this.add.image(0, 0, "btn").setAlpha(0).setScale(0.2).setY(150);
+    this.footer = this.add.image(0, 0, "footer").setY(220);
+
+    // 📦 UI container
+    this.UIGroup = this.add.container(centerX, width, [
+      this.text1,
+      this.text2,
+      this.btn,
+      this.footer,
     ]);
-    // tweens
-    //   targets: logo,
-    //   x: 120,
-    //   duration: 1000,
-    //   ease: "Power2",
-    //   delay: 300,
-    //   onComplete: () => {
-    //     this.showUIElements([panda, text1, text2, btn, footer]);
-    //   },
-    // });
+
+    // 🎮 Button interaction
+    this.btn.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
+      this.fadeToScene("PlayingScenes", 300); // BaseScene hỗ trợ fade
+    });
+
+    // 🎬 Animation
+    this.playIntroTimeline(centerX);
+  }
+
+  playIntroTimeline(centerX) {
     const timeline = this.add.timeline([
       {
         at: 0,
         tween: {
-          targets: logo,
+          targets: this.logo,
           x: 120,
           duration: 1000,
           ease: "Power2",
@@ -75,7 +69,7 @@ export default class GameScene extends Phaser.Scene {
       {
         from: 300,
         tween: {
-          targets: panda,
+          targets: this.panda,
           x: centerX,
           alpha: 1,
           duration: 1000,
@@ -85,7 +79,7 @@ export default class GameScene extends Phaser.Scene {
       {
         from: 300,
         tween: {
-          targets: text1,
+          targets: this.text1,
           y: 0,
           alpha: 1,
           duration: 800,
@@ -95,17 +89,17 @@ export default class GameScene extends Phaser.Scene {
       {
         from: 300,
         tween: {
-          targets: btn,
-          scale: 1, 
+          targets: this.btn,
+          scale: 1,
           alpha: 1,
-          ease: "Back.Out", 
+          ease: "Back.Out",
           duration: 600,
         },
       },
       {
         from: 300,
         tween: {
-          targets: text2,
+          targets: this.text2,
           scale: 1,
           alpha: 1,
           ease: "Back.Out",
@@ -116,6 +110,4 @@ export default class GameScene extends Phaser.Scene {
 
     timeline.play();
   }
-
-  update() {}
 }
